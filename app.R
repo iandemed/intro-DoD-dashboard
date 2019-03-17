@@ -24,7 +24,7 @@ library(shinydashboard)
 ui <- dashboardPage(
   dashboardHeader(
     title = "Visualizing the Suicide Health Epidemic",
-    titleWidth = 300
+    titleWidth = 500
   ),
   
   dashboardSidebar(disable = TRUE),
@@ -46,7 +46,7 @@ ui <- dashboardPage(
                           
                           fluidRow(
                             box(width = 12, collapsible = TRUE, status = "primary", solidHeader = TRUE,
-                                title = "Types of Suicide/Self-Inflicted Death",
+                                title = strong("Age Distribution"),
                                 tabsetPanel(
                                   tabPanel(strong("Total"), style = "min-height:450px",
                                            column(6,br(),plotlyOutput("DoD_total_plot1")),

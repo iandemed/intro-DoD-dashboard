@@ -71,11 +71,10 @@ get_plot_data <- function(group_name, Sex_chr, death_lst){
     stop("death_lst must be a list object")
   } else if (!is.data.frame(death_lst$DeathRecords) | !is.data.frame(death_lst$Icd10Codes)){
     stop("List does not contain necessary data.frames: DeathRecords, Icd10Codes")
-  } else if (!str_detect(group_name, "Firearms|Poisoning") | 
-             !str_detect(group_name, "Self-harm by Jumping") |
-             !str_detect(group_name, "Suffocation or Drowning")){
-    stop("Incorrect group_name. The following group_names are valid: Firearms, Poisoning, Self-harm by Jumping, Suffocation or Drowning")
-  } else if (!str_detect(Sex_chr, "M|F")){
+  } else if ( !(group_name %in% c("Total", "Firearms","Poisoning", "Self-harm by Jumping", "Suffocation or Drowning"))){
+    stop("Incorrect group_name. The following group_names are valid: Total, Firearms, Poisoning, Self-harm by Jumping, Suffocation or Drowning")
+  } 
+  else if (!str_detect(Sex_chr, "M|F")){
     stop("Sex_chr must either be 'M' or 'F'")
   }
   
@@ -168,11 +167,11 @@ update_histogram_plot <- function(plotly_obj = plotly_config(plot_ly()), plot_in
   
   if (!is.list(plot_info)){
     stop("plot_info is not a list object")
-  } (!is.data.frame(plot_info$data) | !is.numeric(plot_info$grp_avg) |
+  } else if (!is.data.frame(plot_info$data) | !is.numeric(plot_info$grp_avg) |
        !is.numeric(plot_info$sex_avg) | !is.numeric(plot_info$ymax)){
     stop("plot_info is missing one of the following elements: data, grp_avg, sex_avg, ymax")
-  } else if (!str_detect(Sex_chr, "M|F")){
-    stop("Sex_chr must either be 'M' or 'F'")
+  } else if (!str_detect(Sex, "M|F")){
+    stop("Sex must either be 'M' or 'F'")
   } else if (!is.numeric(binwidth) | binwidth == 0){
     stop("binwidth must be a non-zero numeric value")
   }
@@ -237,6 +236,23 @@ create_histogram_chart <- function(plot_info, gph_title,
                                    lineColors = c("red", "black", "black"),
                                    binwidth = 1){
   
+  
+  if (!is.list(plot_info)){
+    stop("plot_info is not a list object")
+  } else if (!is.data.frame(plot_info$data) | !is.data.frame(plot_info$stats) |
+        !is.numeric(plot_info$ymax)){
+    stop("plot_info is missing one of the following elements: data, stats, sex_avg, ymax")
+  } else if (!is.character(barColors) | barColors != 2){
+    stop("barColors is misspecified: It must be a 2 element character vector")
+  } else if (!is.character(dashStyle) | dashStyle != 3){
+    stop("dashStyle is misspecified: It must be a 3 element character vector")
+  } else if (!is.character(lineColors) | barColors != 3){
+    stop("barColors is misspecified: It must be a 3 element character vector")
+  } else if (!is.numeric(binwidth) | binwidth == 0){
+    stop("binwidth must be a non-zero numeric value")
+  }
+   
+  
   # Give the sex variable a more meaningful label for display on
   # graphs
   dat = plot_info$dat %>% mutate(Sex = case_when( Sex == "M" ~ "Male",
@@ -289,6 +305,17 @@ create_histogram_chart <- function(plot_info, gph_title,
 
 create_histogram_pdf <- function(death_lst, file_name = "DoD_hist.pdf", 
                                  types = c("Total", "Firearms", "Poisoning", "Self-harm by Jumping", "Suffocation or Drowning")){
+  
+  
+  if (!is.list(death_lst)){
+    stop("death_lst must be a list object")
+  } else if (!is.data.frame(death_lst$DeathRecords) | !is.data.frame(death_lst$Icd10Codes)){
+    stop("List does not contain necessary data.frames: DeathRecords, Icd10Codes")
+  }  else if (!is.character(file_name) | !str_detect(file_name, ".pdf")) {
+    stop("file_name must be a character vector with .pdf file extentsion")
+  } else if ( !(types %in% c("Total", "Firearms","Poisoning", "Self-harm by Jumping", "Suffocation or Drowning"))){
+    stop("Incorrect types. The following types are valid: Total, Firearms, Poisoning, Self-harm by Jumping, Suffocation or Drowning")
+  } 
   
   # Initialize the list of figures
   hist_gphs <- list()
